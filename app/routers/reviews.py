@@ -108,8 +108,9 @@ async def delete_review(review_id: int,
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
     # Проверяем, что отзыв принадлежит пользователю
-    if current_user.id != review.user_id:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role == 'buyer':
+        if current_user.id != review.user_id:
+            raise HTTPException(status_code=403, detail="Not enough permissions")
     # Удаляем отзыв
     await db.execute(update(ReviewModel).where(ReviewModel.id == review_id).values(is_active=False))
     await db.commit()
